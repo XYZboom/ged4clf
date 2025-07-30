@@ -39,9 +39,13 @@ include_directories(${JAVA_HOME}/include/linux)
 link_directories(${GEDLIB_ROOT}/ext/nomad.3.8.1/lib)
 link_directories(${GEDLIB_ROOT}/ext/libsvm.3.22)
 link_directories(${GEDLIB_ROOT}/ext/fann.2.2.0/lib)
+include_directories(src/main/headers)
 #target_link_libraries(your_target gedlib)
 
-add_library(Ged4CLF SHARED src/main/cpp/lib.cpp)
+add_library(Ged4CLF SHARED
+        src/main/cpp/GEDLIB.cpp
+        src/main/cpp/utils.cpp
+)
 #target_link_libraries(Ged4CLF PRIVATE ${GEDLIB_ROOT}/ext/fann.2.2.0/lib/libdoublefann.2.dylib)
 target_link_libraries(Ged4CLF PRIVATE ${GEDLIB_ROOT}/ext/libsvm.3.22/libsvm.so)
 target_link_libraries(Ged4CLF PRIVATE ${GEDLIB_ROOT}/ext/nomad.3.8.1/lib/libnomad.so)

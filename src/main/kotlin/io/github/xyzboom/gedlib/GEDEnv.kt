@@ -53,10 +53,16 @@ class GEDEnv {
             for (libName in libNames) {
                 val resource = loader.getResourceAsStream("gedlib/$os/$libName")!!
                 val tempFile = File(tempDirectory.resolve(libName).absolutePathString())
-                tempFile.outputStream().use { outputStream ->
-                    resource.copyTo(outputStream)
+                tempFile.apply {
+                    outputStream().use { outputStream ->
+                        resource.copyTo(outputStream)
+                    }
+                    setReadable(true)
+                    setExecutable(true)
                 }
             }
+            // load the gxlgedlib first because Java can not find this itself.
+            System.load(tempDirectory.resolve("libgxlgedlib.so").absolutePathString())
             System.load(tempDirectory.resolve("libged4jni.so").absolutePathString())
         }
 

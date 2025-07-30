@@ -1,6 +1,9 @@
 package io.github.xyzboom.gedlib
 
+import java.io.File
 import java.lang.ref.Cleaner
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.createTempDirectory
 
 
 /**
@@ -22,8 +25,39 @@ class GEDEnv {
     companion object {
         private val cleaner = Cleaner.create()
 
+        private val libNames = listOf(
+            "libdoublefann.so.2",
+            "libged4jni.so",
+            "libgxlgedlib.so",
+            "libnomad.so",
+            "libsgtelib.so",
+            "libsvm.so",
+        )
+
         init {
-            System.loadLibrary("ged4jni")
+            prepareDynamicLib()
+        }
+
+        private fun prepareDynamicLib() {
+            val os = System.getProperty("os.name").lowercase()
+
+            when {
+                "linux" in os -> "linux"
+                "win" in os -> "win"
+                else -> throw RuntimeException("Unsupported OS: $os")
+            }
+
+            val loader = this::class.java.classLoader
+            val tempDirectory = createTempDirectory(prefix = "gedlib")
+            File(tempDirectory.absolutePathString()).deleteOnExit()
+            for (libName in libNames) {
+                val resource = loader.getResourceAsStream("gedlib/$os/$libName")!!
+                val tempFile = File(tempDirectory.resolve(libName).absolutePathString())
+                tempFile.outputStream().use { outputStream ->
+                    resource.copyTo(outputStream)
+                }
+            }
+            System.load(tempDirectory.resolve("libged4jni.so").absolutePathString())
         }
 
         @JvmStatic

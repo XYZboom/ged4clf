@@ -7,7 +7,7 @@ plugins {
 
 val myGroup = "io.github.xyzboom"
 val myId = "ged4clf"
-val myVersion = "0.1.0"
+val myVersion = "0.2.0"
 group = myGroup
 version = myVersion
 

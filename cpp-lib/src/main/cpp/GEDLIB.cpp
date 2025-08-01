@@ -6,6 +6,12 @@
 
 typedef ged::GEDEnv<ged::GXLNodeID, ged::GXLLabel, ged::GXLLabel> GEDEnv;
 
+void throwGEDException(JNIEnv *env, const char *msg) {
+    auto exClass = env->FindClass("io/github/xyzboom/gedlib/GEDException");
+    env->ThrowNew(exClass, msg);
+    env->DeleteLocalRef(exClass);
+}
+
 GEDEnv *toNativeEnv(JNIEnv *env, jobject obj) {
     jclass envClass = env->FindClass("io/github/xyzboom/gedlib/GEDEnv");
     if (envClass == nullptr) {
@@ -129,7 +135,11 @@ Java_io_github_xyzboom_gedlib_GEDGraph_addNodeNative(
     auto gEnv = toNativeEnv(env, jEnv);
     auto strNodeId = jstring_to_std(env, nodeId);
     auto mapNodeProperties = java_map_to_cpp_map(env, nodeProperties);
-    gEnv->add_node(gId, strNodeId, mapNodeProperties);
+    try {
+        gEnv->add_node(gId, strNodeId, mapNodeProperties);
+    } catch (ged::Error& e) {
+        throwGEDException(env, e.what());
+    }
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -143,7 +153,11 @@ Java_io_github_xyzboom_gedlib_GEDGraph_addEdgeNative(
     auto fromId = jstring_to_std(env, jFromId);
     auto toId = jstring_to_std(env, jToId);
     auto properties = java_map_to_cpp_map(env, jProperties);
-    gEnv->add_edge(gId, fromId, toId, properties, jIgnoreDuplicates);
+    try {
+        gEnv->add_edge(gId, fromId, toId, properties, jIgnoreDuplicates);
+    } catch (ged::Error& e) {
+        throwGEDException(env, e.what());
+    }
 }
 
 #endif // GEDGRAPH

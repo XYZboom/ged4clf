@@ -8,8 +8,8 @@ plugins {
 val myGroup = "io.github.xyzboom"
 val myId = "ged4clf"
 val myVersion = "0.1.0"
-group = "io.github.xyzboom"
-version = "1.0-SNAPSHOT"
+group = myGroup
+version = myVersion
 
 repositories {
     mavenCentral()
